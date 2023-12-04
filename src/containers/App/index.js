@@ -1,19 +1,13 @@
-import { Link } from "react-router-dom";
 
-import logo from "images/logo.svg";
 import "./App.css";
 import Col from "react-bootstrap/Col";
-import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
-import { Container } from "react-bootstrap";
-import dreamSpike from "../../muse_data/dreamSpike.png";
+import { Container, Dropdown } from "react-bootstrap";
 import styled from "styled-components";
 
-import { Line } from "react-chartjs-2";
 import { useState } from "react";
-import Chart from "chart.js/auto";
 
-import data from "../../muse_data/sleepData.json";
+import { default as _map } from "lodash/map";
 
 const Block = styled(Col)`
   border-style: solid;
@@ -24,7 +18,24 @@ const Block = styled(Col)`
   margin: 40px 20px;
 `;
 
-function App() {
+const App = () => {
+  const loader = require.context("../../muse_data/", true);
+  const data = loader
+    .keys()
+    .filter((file) => file.endsWith(".json"))
+    .map((json) => {
+      console.log(json);
+      return loader(json);
+    });
+  const [selectedIdx, setSelectedIdx] = useState(0);
+  const {
+    date,
+    good_sleep_time,
+    shallow_sleep_time,
+    good_sleep_percent,
+    quality,
+    graph,
+  } = data[selectedIdx];
   return (
     <Container>
       <h1
@@ -33,18 +44,35 @@ function App() {
       >
         EEG Sleeping Monitoring Interface
       </h1>
+      <Dropdown data-bs-theme="dark" className="d-flex justify-content-center">
+        <Dropdown.Toggle id="dropdown-button-dark-example1" variant="secondary">
+          {date}
+        </Dropdown.Toggle>
+
+        <Dropdown.Menu>
+          {_map(data, (json, idx) => (
+            <Dropdown.Item
+              key={idx}
+              onClick={() => {
+                setSelectedIdx(idx);
+              }}
+              active={idx === selectedIdx}
+            >
+              {json.date}
+            </Dropdown.Item>
+          ))}
+        </Dropdown.Menu>
+      </Dropdown>
       <Row className="d-flex justify-content-evenly">
         <Col>
           <Row>
             <Block>
-              <Container>Good Sleep Time: {data.good_sleep_time}hr</Container>
+              <Container>Good Sleep Time: {good_sleep_time}hr</Container>
             </Block>
           </Row>
           <Row>
             <Block>
-              <Container>
-                Shallow Sleep Time: {data.shallow_sleep_time}hr
-              </Container>
+              <Container>Shallow Sleep Time: {shallow_sleep_time}hr</Container>
             </Block>
           </Row>
         </Col>
@@ -52,21 +80,7 @@ function App() {
           <Row>
             <Block>
               Dream Time and Brain Activity
-              {/* <Line
-                data={{
-                  labels: data.timestamps,
-                  datasets: [
-                    {
-                      label: "My First dataset",
-                      backgroundColor: "rgba(194, 116, 161, 0.5)",
-                      borderColor: "rgb(194, 116, 161)",
-                      data: data.values,
-                    },
-                  ],
-                }}
-                options={{ responsive: true }}
-              /> */}
-              <img src={dreamSpike} alt="Trees" height="300"></img>
+              <img src={loader(`./${graph}`)} alt="Trees" height="300"></img>
             </Block>
           </Row>
         </Col>
@@ -87,7 +101,7 @@ function App() {
               className="d-flex justify-content-center"
               style={{ fontWeight: "bolder" }}
             >
-              {data.good_sleep_percent}%
+              {good_sleep_percent}%
             </Container>
           </Block>
           <Col xs></Col>
@@ -100,7 +114,7 @@ function App() {
               className="d-flex justify-content-center"
               style={{ fontWeight: "bolder" }}
             >
-              {data.quality}
+              {quality}
             </Container>
           </Block>
           <Col xs></Col>
@@ -108,6 +122,6 @@ function App() {
       </Row>
     </Container>
   );
-}
+};
 
 export default App;
