@@ -28,8 +28,6 @@ import { Footer } from 'flowbite-react';
 
 import { default as _map } from "lodash/map";
 
-import { useState } from "react";
-
 
 const Block = styled(Col)`
   border-style: solid;
@@ -228,13 +226,13 @@ const App = () => {
         <Col>
           <Row>
             <Card >
-              <Typography gutterBottom variant="h5" component="div" mb={3}>Good Sleep Time: {data.good_sleep_time}hr</Typography>
+              <Typography gutterBottom variant="h5" component="div" mb={3}>Good Sleep Time: {good_sleep_time}hr</Typography>
             </Card>
           </Row>
           <Row>
           <Card lg="8" style={{ marginTop: "100px"}}>
               <Typography gutterBottom variant="h5" component="div">
-                Shallow Sleep Time: {data.shallow_sleep_time}hr
+                Shallow Sleep Time: {shallow_sleep_time}hr
               </Typography>
             </Card>
           </Row>
