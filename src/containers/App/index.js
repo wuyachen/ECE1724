@@ -1,12 +1,8 @@
-import { Link } from "react-router-dom";
 
-import logo from "images/logo.svg";
 import "./App.css";
 import Col from "react-bootstrap/Col";
-import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
-import { Container } from "react-bootstrap";
-import dreamSpike from "../../muse_data/dreamSpike.png";
+import { Container, Dropdown } from "react-bootstrap";
 import styled from "styled-components";
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -30,6 +26,8 @@ import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import { Footer } from 'flowbite-react';
 
+import { default as _map } from "lodash/map";
+
 
 const Block = styled(Col)`
   border-style: solid;
@@ -43,7 +41,24 @@ const Block = styled(Col)`
 const pages = ['Products', 'Pricing', 'Blog'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
-function App() {
+const App = () => {
+  const loader = require.context("../../muse_data/", true);
+  const data = loader
+    .keys()
+    .filter((file) => file.endsWith(".json"))
+    .map((json) => {
+      console.log(json);
+      return loader(json);
+    });
+  const [selectedIdx, setSelectedIdx] = useState(0);
+  const {
+    date,
+    good_sleep_time,
+    shallow_sleep_time,
+    good_sleep_percent,
+    quality,
+    graph,
+  } = data[selectedIdx];
   const [active, setActive] = useState("");
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -188,7 +203,26 @@ function App() {
       >
         EEG Sleeping Monitoring Interface
       </h1>
-      <Row className="d-flex justify-content-evenly mt-5">
+      <Dropdown data-bs-theme="dark" className="d-flex justify-content-center">
+        <Dropdown.Toggle id="dropdown-button-dark-example1" variant="secondary">
+          {date}
+        </Dropdown.Toggle>
+
+        <Dropdown.Menu>
+          {_map(data, (json, idx) => (
+            <Dropdown.Item
+              key={idx}
+              onClick={() => {
+                setSelectedIdx(idx);
+              }}
+              active={idx === selectedIdx}
+            >
+              {json.date}
+            </Dropdown.Item>
+          ))}
+        </Dropdown.Menu>
+      </Dropdown>
+     <Row className="d-flex justify-content-evenly mt-5">
         <Col>
           <Row>
             <Card >
@@ -208,21 +242,7 @@ function App() {
           <Row>
             <Card>
               <h5>Dream Time and Brain Activity</h5>
-              {/* <Line
-                data={{
-                  labels: data.timestamps,
-                  datasets: [
-                    {
-                      label: "My First dataset",
-                      backgroundColor: "rgba(194, 116, 161, 0.5)",
-                      borderColor: "rgb(194, 116, 161)",
-                      data: data.values,
-                    },
-                  ],
-                }}
-                options={{ responsive: true }}
-              /> */}
-              <img src={dreamSpike} alt="Trees" height="300"></img>
+              <img src={loader(`./${graph}`)} alt="Trees" height="300"></img>
             </Card>
           </Row>
         </Col>
@@ -243,7 +263,7 @@ function App() {
               className="d-flex justify-content-center"
               style={{ fontWeight: "bolder" }}
             >
-              {data.good_sleep_percent}%
+              {good_sleep_percent}%
             </Container>
           </Card>
           <Col xs></Col>
@@ -256,7 +276,7 @@ function App() {
               className="d-flex justify-content-center"
               style={{ fontWeight: "bolder" }}
             >
-              {data.quality}
+              {quality}
             </Container>
           </Card>
           <Col xs></Col>
@@ -269,6 +289,6 @@ function App() {
       </div>
     </Container>
   );
-}
+};
 
 export default App;
