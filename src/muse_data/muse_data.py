@@ -31,7 +31,6 @@ data['Alpha'] = pd.to_numeric(data['Alpha'], errors='coerce')
 data.dropna(subset=['Alpha'], inplace=True)
 
 data_a = data['Alpha']
-# data_a = data_a/np.linalg.norm(data_a, axis=0)
 
 # Compute mean and standard deviation
 mean, std = np.mean(data_a), np.std(data_a)
@@ -137,6 +136,9 @@ plt.xticks(np.arange(0, len(data_a), len(data_a)//40))
 plt.plot(timestamps, data_a, label='Alpha', color='blue')
 plt.scatter(timestamp_spikes, spikes, color='red', label='Spikes')
 plt.scatter(timestamp_spikes_n, spikes_n, color='red')
+plt.margins(x=0)
+plt.axhline(y = threshold, color = 'r', linestyle = '-') 
+plt.axhline(y = threshold_n, color = 'r', linestyle = '-') 
 plt.title('Alpha Column with Detected Spikes')
 plt.xlabel('Sleeping Time')
 plt.ylabel('Alpha Value')
