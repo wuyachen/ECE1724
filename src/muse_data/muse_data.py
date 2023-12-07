@@ -2,11 +2,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import json 
+from scipy.stats import norm
+from datetime import datetime
+import time
 
 
+dt = time.strftime("%Y-%m-%d-%H-%M-%S")
 samples = []
-# with open("live_data_Wayne.csv") as f:
-with open("live_data_Wayne1.csv") as f:
+file_path = "live_data_goodSleep.csv"
+with open(file_path) as f:
   f.readline()
   for line in f:
     try:
@@ -17,8 +21,8 @@ with open("live_data_Wayne1.csv") as f:
 samples = np.array(samples)
 num_of_data = len(samples)
 
+
 # Load the dataset
-file_path = "live_data_Wayne1.csv"
 data = pd.read_csv(file_path)
 data_n = pd.read_csv(file_path)
 
@@ -26,36 +30,42 @@ data_n = pd.read_csv(file_path)
 data['Alpha'] = pd.to_numeric(data['Alpha'], errors='coerce')
 data.dropna(subset=['Alpha'], inplace=True)
 
-# Calculating mean and standard deviation
-alpha_mean = data['Alpha'].mean()
-alpha_std = data['Alpha'].std()
+data_a = data['Alpha']
 
-# Spike detection threshold
-# threshold = alpha_mean + 3 * alpha_std
-threshold = 0.6
-spikes = data[data['Alpha'] > threshold]
-times = data['Alpha'] > threshold
+# Compute mean and standard deviation
+mean, std = np.mean(data_a), np.std(data_a)
+threshold = mean+3*std
+threshold_n = mean-3*std
+spikes = data_a[data_a > threshold]
+times = data_a > threshold
 
-
-# Converting 'Alpha' column to numeric and dropping NaNs
-data_n['Alpha'] = -pd.to_numeric(data['Alpha'], errors='coerce')
-data_n.dropna(subset=['Alpha'], inplace=True)
-
-# Calculating mean and standard deviation
-alpha_mean_n = data_n['Alpha'].mean()
-alpha_std_n = data_n['Alpha'].std()
-
-# Spike detection threshold
-# threshold_n = alpha_mean_n + 3 * alpha_std_n
-threshold_n = 0.72
-spikes_n = data_n[data_n['Alpha'] > threshold_n]
-times_n = data_n['Alpha'] > threshold_n
-
+spikes_n = data_a[data_a < threshold_n]
+times_n = data_a > threshold_n
 
 # Collect Spike data and define sleep time and quality
 spikes_pos = np.array(spikes.index)
 spikes_neg = np.array(spikes_n.index)
 spikes_all = np.sort(np.concatenate((spikes_pos, spikes_neg)))
+
+data['Timestamp'] = pd.to_numeric(data['Timestamp'], errors='coerce')
+data.dropna(subset=['Timestamp'], inplace=True)
+data_time = data['Timestamp']
+timestamps = []
+for i, timestamp in enumerate(data_time):
+  timestamp = datetime.fromtimestamp(timestamp)
+  timestamp = timestamp.strftime("%H-%M-%S")
+  timestamps.append(timestamp)
+
+
+timestamp_spikes = []
+timestamp_spikes_n = []
+for i in spikes.index:
+  timestamp_spikes.append(timestamps[i])
+# print(timestamp_spikes)
+for i in spikes_n.index:
+  timestamp_spikes_n.append(timestamps[i])
+# print(timestamp_spikes_n)
+
 
 def is_good_sleep(allSpike, i):
   start = i-750
@@ -89,7 +99,6 @@ def GoodSleepTime(allSpike, num_of_data):
   
   sleep_time = round(sleep_count/5/60/60, 2)
   shallow_sleep_count = num_of_data-sleep_count
-  # print(shallow_sleep_count)
   shallow_sleep_time = round(shallow_sleep_count/5/60/60, 2)
   return sleep_count, shallow_sleep_count, sleep_time, shallow_sleep_time, boolean_sleep_array
 
@@ -110,24 +119,29 @@ percent, result = sleepQuality(sleep_count, num_of_data)
 
 # Store data into json file
 value ={  
+    "date": dt,
     "good_sleep_time": sleep_time,
     "shallow_sleep_time": shallow_sleep_time,
     "good_sleep_percent": percent,
-    "quality": result
+    "quality": result,
+    "graph": f"{dt}.png"
 }  
-save_file = open("sleepData.json", "w")  
+save_file = open(f"{dt}.json", "w")  
 json.dump(value, save_file, indent = 6)  
 save_file.close() 
 
-
 # Plotting
 plt.figure(figsize=(15, 6))
-plt.plot(data['Alpha'], label='Alpha', color='blue')
-plt.scatter(spikes.index, spikes['Alpha'], color='red', label='Spikes')
-plt.scatter(spikes_n.index, -spikes_n['Alpha'], color='red')
+plt.xticks(np.arange(0, len(data_a), len(data_a)//40))
+plt.plot(timestamps, data_a, label='Alpha', color='blue')
+plt.scatter(timestamp_spikes, spikes, color='red', label='Spikes')
+plt.scatter(timestamp_spikes_n, spikes_n, color='red')
+plt.margins(x=0)
+plt.axhline(y = threshold, color = 'r', linestyle = '-') 
+plt.axhline(y = threshold_n, color = 'r', linestyle = '-') 
 plt.title('Alpha Column with Detected Spikes')
-plt.xlabel('Index')
+plt.xlabel('Sleeping Time')
 plt.ylabel('Alpha Value')
 plt.legend()
 #plt.show()
-plt.savefig('dreamSpike_Wayne1.png')
+plt.savefig(f'{dt}.png')
