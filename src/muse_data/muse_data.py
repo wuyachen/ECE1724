@@ -9,7 +9,7 @@ import time
 
 dt = time.strftime("%Y-%m-%d-%H-%M-%S")
 samples = []
-file_path = "live_data_goodSleep.csv"
+file_path = "live_data_Wayne.csv"
 with open(file_path) as f:
   f.readline()
   for line in f:
@@ -137,8 +137,8 @@ plt.plot(timestamps, data_a, label='Alpha', color='blue')
 plt.scatter(timestamp_spikes, spikes, color='red', label='Spikes')
 plt.scatter(timestamp_spikes_n, spikes_n, color='red')
 plt.margins(x=0)
-plt.axhline(y = threshold, color = 'r', linestyle = '-') 
-plt.axhline(y = threshold_n, color = 'r', linestyle = '-') 
+# plt.axhline(y = threshold, color = 'r', linestyle = '-') 
+# plt.axhline(y = threshold_n, color = 'r', linestyle = '-') 
 plt.title('Alpha Column with Detected Spikes')
 plt.xlabel('Sleeping Time')
 plt.ylabel('Alpha Value')
