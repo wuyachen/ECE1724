@@ -5,15 +5,10 @@ import Row from "react-bootstrap/Row";
 import { Container, Dropdown } from "react-bootstrap";
 import styled from "styled-components";
 import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import { Line } from "react-chartjs-2";
 import { useState } from "react";
-import Chart from "chart.js/auto";
 import Typography from '@mui/material/Typography';
 
-import data from "../../muse_data/sleepData.json";
 import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
@@ -24,7 +19,6 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
-import { Footer } from 'flowbite-react';
 
 import { default as _map } from "lodash/map";
 
@@ -78,7 +72,7 @@ const App = () => {
     setAnchorElUser(null);
   };
   return (
-    
+
     <Container>
       <Toolbar disableGutters>
           <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
@@ -282,7 +276,7 @@ const App = () => {
         </Row>
       </Row>
       <div class="footer" style={{ backgroundColor: 'rgba(0, 0, 0, 0.05)' }}>
-        © 2023 Copyright: 
+        © 2023 Copyright:
         <a className='text-reset fw-bold' href='https://chimerical-tiramisu-4e51ef.netlify.app/'> Brain Gang
         </a>
       </div>
